@@ -6,8 +6,6 @@ local fn = vim.fn
 --> Module level variables
 local session_dir = "~/.sessions/"
 
-print("loaded_session manager")
-
 local M = {}
 M.current_session = nil
 
