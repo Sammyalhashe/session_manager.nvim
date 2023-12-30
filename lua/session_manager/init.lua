@@ -55,7 +55,15 @@ end
 
 --> exposed module functions.
 function M.openSession(sessionName)
+    local previous_session = M.current_session
     cmd.source(sessionName)
+    if vim.g.errmsg ~= "" then
+        -- session failed to load for some reason, switch back
+        if previous_session ~= nil then
+            cmd.source(previous_session)
+        end
+        return
+    end
     M.current_session = sessionName
     local s, notes = pcall(require, "notes_for_projects")
     if s then
