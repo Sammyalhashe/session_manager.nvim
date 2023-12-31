@@ -1,4 +1,4 @@
-local utils = require("utils")
+local utils = require("session_manager.utils")
 
 local cmd = vim.cmd
 local fn = vim.fn
