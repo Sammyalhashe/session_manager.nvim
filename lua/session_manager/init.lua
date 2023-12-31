@@ -62,9 +62,9 @@ function M.openSession(sessionName)
     if vim.g.errmsg ~= "" then
         -- session failed to load for some reason, switch back
         if previous_session ~= nil then
-            cmd.source("tmp")
+            cmd.source(utils.expandFilePath(session_dir) .. "tmp")
         end
-        M.removeSession("tmp", false)
+        M.removeSession(utils.expandFilePath(session_dir) .. "tmp", false)
         return
     end
     M.current_session = sessionName
@@ -145,8 +145,8 @@ function M.newSession()
     cmd.cd(utils.expandFilePath(dir))
     if utils.file_exists(utils.expandFilePath(session_dir) .. sessionName) then
         print("Session already exists... aborting")
-        cmd.source("tmp")
-        M.removeSession("tmp", false)
+        cmd.source(utils.expandFilePath(session_dir) .. "tmp")
+        M.removeSession(utils.expandFilePath(session_dir) .. "tmp", false)
         return
     end
     local prompt = "&y\n&n\n"
@@ -156,7 +156,7 @@ function M.newSession()
         return
     end
 
-    M.removeSession("tmp", false)
+    M.removeSession(utils.expandFilePath(session_dir) .. "tmp", false)
     M.overwriteSession(sessionName)
 end
 
