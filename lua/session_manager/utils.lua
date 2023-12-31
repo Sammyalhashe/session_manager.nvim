@@ -2,6 +2,15 @@ local M = {}
 
 local io = require("io")
 
+--> Clean the bufferlist
+function M.clearBuffers()
+    local all_bufs = vim.fn.getbufinfo()
+    for _, d in ipairs(all_bufs) do
+        local bufnr = d["bufnr"]
+        vim.cmd.bwipeout(bufnr)
+    end
+end
+
 --> Check whether the current buffer is empty
 function M.is_buffer_empty()
     return vim.fn.empty(vim.fn.expand('%:t')) == 1

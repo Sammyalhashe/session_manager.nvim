@@ -55,6 +55,7 @@ end
 
 --> exposed module functions.
 function M.openSession(sessionName)
+    utils.clearBuffers()
     cmd.source(sessionName)
     M.current_session = sessionName
     local s, notes = pcall(require, "notes_for_projects")
