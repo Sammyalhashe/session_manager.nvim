@@ -55,8 +55,8 @@ end
 
 --> exposed module functions.
 function M.openSession(sessionName)
-    utils.clearBuffers()
     M.overwriteSession("tmp", false)
+    utils.clearBuffers()
     local previous_session = M.current_session
     cmd.source(sessionName)
     if vim.g.errmsg ~= "" then
