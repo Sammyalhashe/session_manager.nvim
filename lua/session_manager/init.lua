@@ -56,7 +56,17 @@ end
 --> exposed module functions.
 function M.openSession(sessionName)
     utils.clearBuffers()
+    M.overwriteSession("tmp", false)
+    local previous_session = M.current_session
     cmd.source(sessionName)
+    if vim.g.errmsg ~= "" then
+        -- session failed to load for some reason, switch back
+        if previous_session ~= nil then
+            cmd.source(previous_session)
+        end
+        M.removeSession("tmp", false)
+        return
+    end
     M.current_session = sessionName
     local s, notes = pcall(require, "notes_for_projects")
     if s then
@@ -68,20 +78,25 @@ function M.openSession(sessionName)
     end
 end
 
-function M.removeSession(sessionName)
-    local prompt = "&y\n&n\n"
-    local res = fn.confirm("Confirm deletion: " .. sessionName .. "?", prompt)
+function M.removeSession(sessionName, ask)
+    if ask == nil or ask then
+        local prompt = "&y\n&n\n"
+        local res = fn.confirm("Confirm deletion: " .. sessionName .. "?", prompt)
 
-    if (res > 1) then
-        return
+        if (res > 1) then
+            return
+        end
     end
 
     fn.delete(sessionName)
 end
 
-function M.overwriteSession(sessionName)
+function M.overwriteSession(sessionName, setSessionName)
     cmd("mks! " .. utils.expandFilePath(session_dir) .. sessionName)
-    M.current_session = sessionName
+
+    if setSessionName == nil or setSessionName then
+        M.current_session = sessionName
+    end
     local s, notes = pcall(require, "notes_for_projects")
     if s then
         local session_split = utils.split_string(sessionName, "/")
