@@ -59,8 +59,7 @@ function M.openSession(sessionName)
     utils.clearBuffers()
     local previous_session = M.current_session
     cmd.source(sessionName)
-    print("errmsg: " .. vim.g.errmsg)
-    if vim.g.errmsg ~= "" then
+    if vim.v.errmsg ~= "" then
         -- session failed to load for some reason, switch back
         if previous_session ~= nil then
             cmd.source(utils.expandFilePath(session_dir) .. "tmp")
