@@ -69,6 +69,7 @@ function M.openSession(sessionName)
     end
     M.removeSession(utils.expandFilePath(session_dir) .. "tmp", false)
     M.current_session = sessionName
+    print("changing session to " .. M.current_session)
     local s, notes = pcall(require, "notes_for_projects")
     if s then
         local session_split = utils.split_string(sessionName, "/")
