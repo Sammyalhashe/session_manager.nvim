@@ -58,11 +58,11 @@ function M.openSession(sessionName)
     M.overwriteSession("tmp", false)
     utils.clearBuffers()
     local previous_session = M.current_session
-    cmd.source{sessionName, bang = true}
+    cmd.source(sessionName)
     if vim.g.errmsg ~= "" then
         -- session failed to load for some reason, switch back
         if previous_session ~= nil then
-            cmd.source{utils.expandFilePath(session_dir) .. "tmp", bang = true}
+            cmd.source(utils.expandFilePath(session_dir) .. "tmp")
         end
         M.removeSession(utils.expandFilePath(session_dir) .. "tmp", false)
         return
