@@ -1,4 +1,4 @@
-local utils = require("utils")
+local utils = require("session_manager.utils")
 
 local cmd = vim.cmd
 local fn = vim.fn
@@ -55,15 +55,19 @@ end
 
 --> exposed module functions.
 function M.openSession(sessionName)
+    M.overwriteSession("tmp", false)
+    utils.clearBuffers()
     local previous_session = M.current_session
     cmd.source{sessionName, bang = true}
     if vim.g.errmsg ~= "" then
         -- session failed to load for some reason, switch back
         if previous_session ~= nil then
-            cmd.source { previous_session, bang = true }
+            cmd.source{utils.expandFilePath(session_dir) .. "tmp", bang = true}
         end
+        M.removeSession(utils.expandFilePath(session_dir) .. "tmp", false)
         return
     end
+    M.removeSession(utils.expandFilePath(session_dir) .. "tmp", false)
     M.current_session = sessionName
     local s, notes = pcall(require, "notes_for_projects")
     if s then
@@ -75,20 +79,25 @@ function M.openSession(sessionName)
     end
 end
 
-function M.removeSession(sessionName)
-    local prompt = "&y\n&n\n"
-    local res = fn.confirm("Confirm deletion: " .. sessionName .. "?", prompt)
+function M.removeSession(sessionName, ask)
+    if ask == nil or ask then
+        local prompt = "&y\n&n\n"
+        local res = fn.confirm("Confirm deletion: " .. sessionName .. "?", prompt)
 
-    if (res > 1) then
-        return
+        if (res > 1) then
+            return
+        end
     end
 
     fn.delete(sessionName)
 end
 
-function M.overwriteSession(sessionName)
+function M.overwriteSession(sessionName, setSessionName)
     cmd("mks! " .. utils.expandFilePath(session_dir) .. sessionName)
-    M.current_session = sessionName
+
+    if setSessionName == nil or setSessionName then
+        M.current_session = sessionName
+    end
     local s, notes = pcall(require, "notes_for_projects")
     if s then
         local session_split = utils.split_string(sessionName, "/")
@@ -130,9 +139,15 @@ function M.saveSession()
 end
 
 function M.newSession()
+    M.overwriteSession("tmp", false)
+    utils.clearBuffers()
     local sessionName = fn.input("Enter the name of the session: ")
+    local dir = fn.input("Session root: ", "", "file")
+    cmd.cd(utils.expandFilePath(dir))
     if utils.file_exists(utils.expandFilePath(session_dir) .. sessionName) then
         print("Session already exists... aborting")
+        cmd.source(utils.expandFilePath(session_dir) .. "tmp")
+        M.removeSession(utils.expandFilePath(session_dir) .. "tmp", false)
         return
     end
     local prompt = "&y\n&n\n"
@@ -142,6 +157,7 @@ function M.newSession()
         return
     end
 
+    M.removeSession(utils.expandFilePath(session_dir) .. "tmp", false)
     M.overwriteSession(sessionName)
 end
 
