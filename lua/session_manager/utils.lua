@@ -7,7 +7,7 @@ function M.clearBuffers()
     local all_bufs = vim.fn.getbufinfo()
     for _, d in ipairs(all_bufs) do
         local bufnr = d["bufnr"]
-        vim.cmd.bwipeout(bufnr)
+        vim.cmd.bwipeout{bufnr, bang=true}
     end
 end
 
